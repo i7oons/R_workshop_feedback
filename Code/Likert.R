@@ -2,6 +2,7 @@
 
 library(tidyverse)
 library(googlesheets4)
+library(plotly)
 
 # Load data
 url <- "https://docs.google.com/spreadsheets/d/12jxEV9rqIOrIw70lVXfSegorv25owciTMS-hjSotioo/edit?resourcekey#gid=1120526525"
@@ -155,6 +156,7 @@ p_explain <- ggplot(explain_1, aes(x = prop, y = fct_rev(topic), fill = fct_rev(
     panel.grid.major.y = element_blank(),
     panel.grid.minor.x = element_blank()
   )
+ggplotly()
 
 p_materials <- ggplot(materials_1, aes(x = prop, y = fct_rev(topic), fill = fct_rev(rating))) +
   geom_col(alpha = 0.8) +
@@ -168,5 +170,6 @@ p_materials <- ggplot(materials_1, aes(x = prop, y = fct_rev(topic), fill = fct_
     legend.position = "bottom",
     panel.grid.major.y = element_blank(),
     panel.grid.minor.x = element_blank()
-  )
+  ) 
 
+ggplotly()

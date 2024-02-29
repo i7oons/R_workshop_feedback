@@ -1,0 +1,568 @@
+---
+title: "R Workshop Feedback"
+author: "Cheng Yew Toon"
+format: html
+date: "29 Feb 2024"
+---
+
+# Report for R Workshop (January 22 to 26, 2024)
+
+------------------------------------------------------------------------
+
+```{r}
+#| echo: false
+#| message : false
+
+
+
+# Plots for Likert chart
+
+# Load package
+library(tidyverse)
+library(googlesheets4)
+library(collapse)
+
+# Set working directory
+here::set_here("/Users/cheng/OneDrive - ird.global/Desktop/R Projects/R Workshop Feedback/R_workshop_feedback")
+
+# Load data
+url <- "https://docs.google.com/spreadsheets/d/12jxEV9rqIOrIw70lVXfSegorv25owciTMS-hjSotioo/edit?resourcekey#gid=1120526525"
+dat <- read_sheet(url)
+
+dat1 <- dat |> 
+  rename(email = 2) |> 
+  filter(row_number() == n(), .by = email) |> # Take the last record if duplicated
+  select(-Timestamp)
+
+respondents_count <- nrow(dat1)
+
+#load data for pre-workshop organisation
+pre_wksp <- dat1 |> 
+  select(email, matches("1.[1-4]")) |> 
+  pivot_longer(-email,
+               names_to = "qns",
+               values_to = "rating") |> 
+  mutate(
+    qns = str_sub(qns, 3, 3) |> as.numeric(), # 3 is the index position of the str_sub for qns
+    qns = case_when(
+      qns == 1 ~ "It was easy to register for the workshop",
+      qns == 2 ~ "Communications for the workshop were clear",
+      qns == 3 ~ "Communications for the workshop were timely",
+      qns == 4 ~ "Instructions for workshop preparation were clear",
+      .default = "Unknown"
+    ),
+    qns = factor(qns,
+                 levels = c("It was easy to register for the workshop","Communications for the workshop were clear",
+                            "Communications for the workshop were timely","Instructions for workshop preparation were clear")),
+    rating = case_when(
+      rating == 1 ~ "Strongly disagree",
+      rating == 2 ~ "Disagree",
+      rating == 3 ~ "Neutral",
+      rating == 4 ~ "Agree",
+      rating == 5 ~ "Strongly agree",
+      .default = "Unknown"
+    ),
+    rating = factor(rating,
+                    levels = c("Strongly disagree", "Disagree", "Neutral",
+                               "Agree", "Strongly agree"))
+  )
+
+pre_wksp_1 <- pre_wksp |> 
+  count(qns, rating) |> 
+  mutate(prop = n/sum(n),
+         .by = qns)
+
+# load data for Facilitator explanation
+explain <- dat1 |> 
+  select(email, matches("^[2-7]\\.1")) |> 
+  pivot_longer(-email,
+               names_to = "topic",
+               values_to = "rating") |> 
+  mutate(
+    topic = str_sub(topic, 1, 1) |> as.numeric(),
+    topic = case_when(
+      topic == 2 ~ "Intro to R",
+      topic == 3 ~ "Data Viz",
+      topic == 4 ~ "Data Wrangling",
+      topic == 5 ~ "Descriptive Analysis",
+      topic == 6 ~ "Intro to Quarto",
+      topic == 7 ~ "Report generation",
+      .default = "Unknown"
+    ),
+    topic = factor(topic,
+                   levels = c("Intro to R", "Data Viz", "Data Wrangling",
+                              "Descriptive Analysis", "Intro to Quarto",
+                              "Report generation")),
+    rating = case_when(
+      rating == 1 ~ "Strongly disagree",
+      rating == 2 ~ "Disagree",
+      rating == 3 ~ "Neutral",
+      rating == 4 ~ "Agree",
+      rating == 5 ~ "Strongly agree",
+      .default = "Unknown"
+    ),
+    rating = factor(rating,
+                    levels = c("Strongly disagree", "Disagree", "Neutral",
+                               "Agree", "Strongly agree")),
+    qns = "The facilitator's explanation was easy to follow"
+  )
+
+explain_1 <- explain |> 
+  count(topic, rating, qns) |> 
+  mutate(prop = n/sum(n),
+         .by = topic)
+
+# load data for materials
+materials <- dat1 |> 
+  select(email, matches("^[2-7]\\.2")) |> 
+  pivot_longer(-email,
+               names_to = "topic",
+               values_to = "rating") |> 
+  mutate(
+    topic = str_sub(topic, 1, 1) |> as.numeric(),
+    topic = case_when(
+      topic == 2 ~ "Intro to R",
+      topic == 3 ~ "Data Viz",
+      topic == 4 ~ "Data Wrangling",
+      topic == 5 ~ "Descriptive Analysis",
+      topic == 6 ~ "Intro to Quarto",
+      topic == 7 ~ "Report generation",
+      .default = "Unknown"
+    ),
+    topic = factor(topic,
+                   levels = c("Intro to R", "Data Viz", "Data Wrangling",
+                              "Descriptive Analysis", "Intro to Quarto",
+                              "Report generation")),
+    rating = case_when(
+      rating == 1 ~ "Strongly disagree",
+      rating == 2 ~ "Disagree",
+      rating == 3 ~ "Neutral",
+      rating == 4 ~ "Agree",
+      rating == 5 ~ "Strongly agree",
+      .default = "Unknown"
+    ),
+    rating = factor(rating,
+                    levels = c("Strongly disagree", "Disagree", "Neutral",
+                               "Agree", "Strongly agree")),
+    qns = "The training materials clear and adequate"
+  )
+
+materials_1 <- materials |> 
+  count(topic, rating, qns) |> 
+  mutate(prop = n/sum(n),
+         .by = topic)
+
+p_pre_wksp <-  ggplot(pre_wksp_1, aes(x = prop, y = fct_rev(qns), fill = fct_rev(rating))) +
+  geom_col(alpha = 0.8, show.legend = TRUE) +
+  labs(x = "", y = "", fill = "",
+       title = "Pre-workshop Organisation") +
+  scale_fill_manual(values = c("#236EC3", "#78AFE6", "#E1E1E1", "#E6AAA0", "#C32314")) +
+  guides(fill = guide_legend(reverse = TRUE)) + # reverse legend order
+  scale_x_continuous(labels = scales::label_percent()) +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.x = element_blank()   
+  )
+
+p_explain <- ggplot(explain_1, aes(x = prop, y = fct_rev(topic), fill = fct_rev(rating))) +
+  geom_col(alpha = 0.8) +
+  labs(x = "", y = "", fill = "",
+       title = "The facilitator's explanation was easy to follow") +
+  scale_fill_manual(values = c("#236EC3", "#78AFE6", "#E1E1E1", "#E6AAA0", "#C32314")) +
+  guides(fill = guide_legend(reverse = TRUE)) + # reverse legend order
+  scale_x_continuous(labels = scales::label_percent()) +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.x = element_blank()
+  )
+
+p_materials <- ggplot(materials_1, aes(x = prop, y = fct_rev(topic), fill = fct_rev(rating))) +
+  geom_col(alpha = 0.8) +
+  labs(x = "", y = "", fill = "",
+       title = "The training materials clear and adequate") +
+  scale_fill_manual(values = c("#236EC3", "#78AFE6", "#E1E1E1", "#E6AAA0", "#C32314")) +
+  guides(fill = guide_legend(reverse = TRUE)) + # reverse legend order
+  scale_x_continuous(labels = scales::label_percent()) +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.x = element_blank()
+  ) 
+
+```
+
+```{r}
+#| echo: false
+#| message : false
+
+# Analysis on feedback and respondents
+
+# Load package
+
+library(tidyverse)
+library(googlesheets4)
+library(stringr)
+library(gtsummary)
+library(flextable)
+
+# Set working directory
+here::set_here("/Users/cheng/OneDrive - ird.global/Desktop/R Projects/R Workshop Feedback/R_workshop_feedback")
+
+# Load data
+url <- "https://docs.google.com/spreadsheets/d/12jxEV9rqIOrIw70lVXfSegorv25owciTMS-hjSotioo/edit?resourcekey#gid=1120526525"
+dat <- read_sheet(url)
+url2 <- "https://docs.google.com/spreadsheets/d/1ZMLHBtBn83r69u0IHmtAyjJ_QU8XV9uevYIuomj8x1g/edit#gid=146447740"
+
+respondents <- dat |> 
+  rename(email = 2) |> 
+  mutate(use_ird_email = str_detect(email, "ird\\.global")) 
+
+registrants <- read_sheet(url2) |> 
+  rename(email = 2, 
+         gender = 6,
+         country = 7,
+         type = 10,
+         org = 11,
+         SSRG = 16
+         ) |> 
+  filter(row_number() == n(), .by = email) |> # Take the last record if duplicated
+  select(email, gender, country, type, org, SSRG) |> 
+  mutate(email = recode(email, 'lapeonalaja@gmail.com' = 'lape.onalaja@ird.global', 'israr.ahmad.hri@nih.org.pk' = 'israrpmrc@gmail.com', 
+  'Mondar.Ahmed@ird.global' = 'mondar.ahmed@ird.global', 'Maryam.younus@ird.global' = 'maryam.younus@ird.global',
+  'aftab.khan.hri@nih.org.pk' = 'aftabropmrc@gmail.com', 'minhal.hyder@ird.golbal' = 'minhal.hyder@ird.global',
+  'mohsin.h.alvi@pill.org.pk' = 'mohsinhassanalvi@gmail.com')) |> 
+  mutate(country = recode(country, 'Karachi' = 'Pakistan'))
+
+# merge details from registrant list to respondents 
+combi <- respondents |> 
+  left_join(registrants)
+
+# flattened feedback of respondents and rename columns
+feedbacks <- combi |> 
+  group_by(email) |> 
+  summarise_all(~paste(ifelse(is.na(.), "", .), collapse = "|")) |> 
+  rename("Organisation - What was done well" = 7,
+         "Organisation - Suggestions to improve" = 8,
+         "Intro to R - What was done well" = 11,
+         "Intro to R - Suggestions to improve" = 12,
+         "Data Viz - What was done well" = 15,
+         "Data Viz - Suggestions to improve" = 16,
+         "Data Wrangling - What was done well" = 19,
+         "Data Wrangling - Suggestions to improve" = 20,
+         "Descriptive Analysis - What was done well" = 23,
+         "Descriptive Analysis - Suggestions to improve" = 24,
+         "Intro to Quarto - What was done well" = 27,
+         "Intro to Quarto - Suggestions to improve" = 28,
+         "Report generation - What was done well" = 31,
+         "Report generation - Suggestions to improve" = 32,
+         "General comments or suggestions" = 33
+  ) |> 
+  select(1,7,8,11,12,15,16,19,20,23,24,27,28,31,32,33)
+
+# Summary table for registrants
+registrants_details <- registrants |> 
+  filter(row_number() == n(), .by = email) |> 
+  select(2 : 6) |> 
+  tbl_summary()
+  
+# Summary table for respondents
+respondents_details <- combi |> 
+  filter(row_number() == n(), .by = email) |>
+  select(35 : 39) |> 
+  tbl_summary()
+
+#Splitting the feedback by sections
+feedback_org <- feedbacks |> 
+  select(starts_with("Organisation")) |> 
+  rename("What was done well" = 1,
+         "Suggestions to improve" = 2) |> 
+  flextable() |> 
+  set_table_properties(layout = "autofit") |> 
+  set_caption(caption = "Feedback on pre-workshop Organisation")
+
+feedback_intro <- feedbacks |> 
+  select(starts_with("Intro to R")) |> 
+  rename("What was done well" = 1,
+         "Suggestions to improve" = 2) |> 
+  flextable() |> 
+  set_table_properties(layout = "autofit") |> 
+  set_caption(caption = "Feedback on Intro to R")
+
+feedback_viz <- feedbacks |> 
+  select(starts_with("Data Viz")) |> 
+  rename("What was done well" = 1,
+         "Suggestions to improve" = 2) |> 
+  flextable() |> 
+  set_table_properties(layout = "autofit") |> 
+  set_caption(caption = "Feedback on Data Viz")
+
+feedback_wrang <- feedbacks |> 
+  select(starts_with("Data Wrangling")) |> 
+  rename("What was done well" = 1,
+         "Suggestions to improve" = 2) |> 
+  flextable() |> 
+  set_table_properties(layout = "autofit") |> 
+  set_caption(caption = "Feedback on Data Wrangling")
+
+feedback_descr <- feedbacks |> 
+  select(starts_with("Descriptive")) |>
+  rename("What was done well" = 1,
+         "Suggestions to improve" = 2) |>
+  flextable() |> 
+  set_table_properties(layout = "autofit") |> 
+  set_caption(caption = "Feedback on Descriptive Analysis")
+
+feedback_quarto <- feedbacks |> 
+  select(starts_with("Intro to Quarto")) |> 
+  rename("What was done well" = 1,
+         "Suggestions to improve" = 2) |>
+  flextable() |> 
+  set_table_properties(layout = "autofit") |> 
+  set_caption(caption = "Feedback on Intro to Quarto")
+
+feedback_report <- feedbacks |> 
+  select(starts_with("Report generation"))|> 
+  rename("What was done well" = 1,
+         "Suggestions to improve" = 2) |>
+  flextable() |> 
+  set_table_properties(layout = "autofit") |> 
+  set_caption(caption = "Feedback on Report generation")
+
+feedback_general <- feedbacks |> 
+  select(starts_with("General")) |> 
+  rename("Remarks" = 1) |> 
+  flextable() |> 
+  set_table_properties(layout = "autofit") |> 
+  set_caption(caption = "General comments or suggestions")
+
+# Summary table for registrants
+registrants_details <- registrants |> 
+  filter(row_number() == n(), .by = email) |> 
+  select(2 : 6) |> 
+  tbl_summary()
+  
+# Summary table for respondents
+respondents_details <- combi |> 
+  filter(row_number() == n(), .by = email) |>
+  select(35 : 39) |> 
+  mutate(
+    gender = setLabels(gender, "Gender"),
+    country = setLabels(country, "Country"),
+    type = setLabels(type, "Type"),
+    org = setLabels(org, "Organization"),
+    SSRG = setLabels(SSRG, "Part of SSRG")
+    )|> 
+  tbl_summary()
+```
+
+## Feedback for R Workshop
+
+Out of `XX` participants who attended the workshop, `r respondents_count` provided their feedback for the workshop.
+
+Below is the demographics of the feedback providers.
+
+```{r}
+#| echo: false
+respondents_details
+```
+
+#### Feedback on Pre-workshop Organisation
+
+```{r}
+#| echo: false
+p_pre_wksp
+```
+
+Based on the feedback of the respondents, the pre-workshop organisation was seen as successful.
+
+The participants were satisfied with the registration process, noting that the large majority `(76.9%)` of the respondents strongly agreed that it was register for the workshop.
+
+`More than 70%` of the respondents strongly agreed that communications for the workshop were clear and they were timely.
+
+Regarding the instructions for the workshop preparation, `57.7%` of the respondents strongly agreed that it was clear and `42.3%` agreed that is was clear.
+
+Below are written feedback provided by the `r nrow(dat1)` respondents.
+
+```{r}
+#| echo: false
+#| collapse: true
+feedback_org
+```
+
+The most common feedback on what was done well for the pre-workshop organisation is that the communication of the workshop was clear and timely.
+
+From the data, many also gave general feedback about the whole workshop in this part of the feedback. It was encouraging to see that the respondents found the workshop to be well organised and informative. The training was found to be interactive and easy to follow.
+
+Some areas of improvement that were suggested includes having more time to practice during the workshop and also have some breaks in between. `6` respondents mentioned that it would be good to have the workshop stretched out with assignments during the intervals, this is so that they can have time to practice.
+
+------------------------------------------------------------------------
+
+### Feedback on workshop activities and materials
+
+In this section we will look at 2 likert scales for facilitator performance and quality of training materials. Subsequently, we will summarize the writtened feedback by the individual topics that were covered during the workshop.
+
+#### Feedback on Facilitator performance
+
+```{r}
+#| echo: false
+p_explain
+```
+
+Regarding the facilitator's performance, the feedback are mostly well received.
+
+-   For Intro to R, `34.6%` of the respondents strongly agreed that the facilitator explanation was easy to follow and the large majority at `57.7%` agreed.
+
+-   For Data Visualization, the large majority of respondents at `50%` strongly agreed that the facilitator explanation was easy to follow and `42.3%` agreed.
+
+-   For Data Wrangling, the large majority of respondents at `50%` strongly agreed that the facilitator explanation was easy to follow and `46.2%` agreed.
+
+-   For Descriptive Analysis, `38.5%` of the respondents strongly agreed that the facilitator explanation was easy to follow and the large majority at `42.3%` agreed.
+
+-   For Intro to Quarto, the large majority of respondents at `50%` strongly agreed that the facilitator explanation was easy to follow and `34.6%` agreed.
+
+-   For Report Generation, the large majority of respondents at `53.8%` strongly agreed that the facilitator explanation was easy to follow and `30.8%` agreed.
+
+#### Quality of training materials
+
+```{r}
+#| echo: false
+p_materials
+```
+
+Regarding the quality of training materials, the feedback are mostly well received as well.
+
+-   For Intro to R, `38.5%` of the respondents strongly agreed that the training materials were clear and adequate and the large majority at `53.8%` agreed.
+
+-   For Data Visualization, the large majority of respondents at `50%` strongly agreed that the training materials were clear and adequate and `46.2%` agreed.
+
+-   For Data Wrangling, `42.3%` of the respondents strongly agreed that the training materials were clear and adequate and the large majority at `53.8%` agreed.
+
+-   For Descriptive Analysis, `38.5%` of the respondents strongly agreed that the training materials were clear and adequate and the large majority at `50%` agreed.
+
+-   For Intro to Quarto, `42.3%` of the respondents strongly agreed that the training materials were clear and adequate and the large majority at `46.2%` agreed.
+
+-   For Report Generation, `42.3%` of the respondents strongly agreed that the training materials were clear and adequate and the large majority at `46.2%` agreed.
+
+------------------------------------------------------------------------
+
+### Feedback by Topics
+
+#### Intro to R
+
+The most common feedback for the topic on Intro to R was that the contents were easy to follow and the session was well paced.
+
+Other comments included were being the training materials were good and the session was information.
+
+The most common suggestions for improvement was that the participants would like to have more hands-on practice and also have more time allocated to practice.
+
+Other suggestions include having to share more materials for the participants to understand more in-depth and the session could be more in-depth.
+
+Below are written feedback provided by the `r nrow(dat1)` respondents for this topic.
+
+```{r}
+#| echo: false
+feedback_intro
+```
+
+------------------------------------------------------------------------
+
+#### Data Visualization
+
+The most common feedback for the topic on Data Visualization was that the topic was very useful and informative.
+
+Other comments included were that the session was very hands-on and the session was well facilitated by having the participants share their screen and troubleshoot their roadblocks along the way.
+
+It is worth noting that many participants highlighted that they enjoyed this session and they would like more time allocated to this topic with more hands-on practice.
+
+Other areas of improvement mentioned was that it would be good to learn more about basic commands and syntax before going into data visualization.
+
+Below are written feedback provided by the `r nrow(dat1)` respondents for this topic.
+
+```{r}
+#| echo: false
+feedback_viz
+```
+
+------------------------------------------------------------------------
+
+#### Data Wrangling
+
+The most common feedback for the topic on Data Wrangling was that the topic was very useful and interactive.
+
+Comments regarding areas of improvement included were that this topic is difficult, so it would be good to have time allocated for this topic and have more practice questions during the session.
+
+Below are written feedback provided by the `r nrow(dat1)` respondents for this topic.
+
+```{r}
+#| echo: false
+feedback_wrang
+```
+
+------------------------------------------------------------------------
+
+#### Descriptive Analysis
+
+The most common feedback for the topic on Descriptive Analysis was that the topic was useful, the session was well delivered and well facilitated.
+
+Most comments regarding areas of improvement were that the session was a little fast for them to follow.
+
+Other suggested areas of improvement is to have more practice and allocate more time to this topic.
+
+Below are written feedback provided by the `r nrow(dat1)` respondents for this topic.
+
+```{r}
+#| echo: false
+feedback_descr
+```
+
+------------------------------------------------------------------------
+
+#### Intro to Quarto
+
+The most common feedback for the topic on Intro to Quarto was that the topic was useful.
+
+Most comments regarding areas of improvement were that the participants would like more practice on this topic.
+
+Below are written feedback provided by the `r nrow(dat1)` respondents for this topic.
+
+```{r}
+#| echo: false
+feedback_quarto
+```
+
+------------------------------------------------------------------------
+
+#### Report Generation
+
+The most common feedback for the topic on Report Generation was that the topic was interesting, useful and the session well demonstrated.
+
+Most comments regarding areas of improvement were that the participants would like more time allocated to this topic and more practice opportunities during the session.
+
+Below are written feedback provided by the `r nrow(dat1)` respondents for this topic.
+
+```{r}
+#| echo: false
+
+feedback_report
+
+```
+
+------------------------------------------------------------------------
+
+#### General feedback and suggestions
+
+The general feedback received was that the workshop was well planned and delivered. The participants were thankful for the learning opportunity and they would like more workshops like this.
+
+Below are written feedback provided by the `r nrow(dat1)` respondents.
+
+```{r}
+#| echo: false
+
+feedback_general
+
+```
