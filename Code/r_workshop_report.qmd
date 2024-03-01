@@ -480,17 +480,17 @@ p_explain
 
 Regarding the facilitator's performance, the feedback are mostly well received.
 
--   For Intro to R, the large majority of the respondents *agreed* that the facilitator explanation was easy to follow.
+-   For Intro to R, the large majority of the respondents **agreed** that the facilitator explanation was easy to follow.
 
--   For Data Visualization, the large majority of respondents *strongly agreed* that the facilitator explanation was easy to follow.
+-   For Data Visualization, the large majority of respondents **strongly agreed** that the facilitator explanation was easy to follow.
 
--   For Data Wrangling, the majority of respondents *strongly agreed* that the facilitator explanation was easy to follow. There is also a small proportion of participants who *disagreed*.
+-   For Data Wrangling, the majority of respondents **strongly agreed** that the facilitator explanation was easy to follow. There is also a small proportion of participants who **disagreed**.
 
--   For Descriptive Analysis, the large majority of respondents *strongly agreed* that the facilitator explanation was easy to follow.
+-   For Descriptive Analysis, the large majority of respondents **strongly agreed** that the facilitator explanation was easy to follow.
 
--   For Intro to Quarto, the large majority of respondents *strongly agreed* that the facilitator explanation was easy to follow.
+-   For Intro to Quarto, the large majority of respondents **strongly agreed** that the facilitator explanation was easy to follow.
 
--   For Report Generation, the large majority of respondents *strongly agreed* that the facilitator explanation was easy to follow.
+-   For Report Generation, the large majority of respondents **strongly agreed** that the facilitator explanation was easy to follow.
 
 #### Quality of training materials
 
@@ -504,17 +504,17 @@ p_materials
 
 Regarding the quality of training materials, the feedback are mostly well received as well.
 
--   For Intro to R, large majority of the respondents *agreed* that the training materials were clear and adequate.There is also a small proportion of participants who *disagreed*.
+-   For Intro to R, large majority of the respondents **agreed** that the training materials were clear and adequate.There is also a small proportion of participants who **disagreed**.
 
--   For Data Visualization, large majority of the respondents *strongly agreed* that the training materials were clear and adequate.
+-   For Data Visualization, large majority of the respondents **strongly agreed** that the training materials were clear and adequate.
 
--   For Data Wrangling, large majority of the respondents *agreed* that the training materials were clear and adequate.
+-   For Data Wrangling, large majority of the respondents **agreed** that the training materials were clear and adequate.
 
--   For Descriptive Analysis, large majority of the respondents *agreed* that the training materials were clear and adequate.
+-   For Descriptive Analysis, large majority of the respondents **agreed** that the training materials were clear and adequate.
 
--   For Intro to Quarto, large majority of the respondents *strongly agreed* that the training materials were clear and adequate.
+-   For Intro to Quarto, large majority of the respondents **strongly agreed** that the training materials were clear and adequate.
 
--   For Report Generation, large majority of the respondents *strongly agreed* that the training materials were clear and adequate.
+-   For Report Generation, large majority of the respondents **strongly agreed** that the training materials were clear and adequate.
 
 ------------------------------------------------------------------------
 
