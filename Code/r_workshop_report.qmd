@@ -1,19 +1,20 @@
 ---
-title: "R Workshop Feedback"
-author: "Cheng Yew Toon"
+title: "R Workshop Report"
+author: "Cheng Yew Toon, Zaw Myo Tun, Maria Baig"
 format: html
-date: "29 Feb 2024"
+date: today
+date-format: "DD MMMM YYYY"
+execute: 
+  echo: false
+  warning: false
+  message: false
 ---
 
 # Report for R Workshop (January 22 to 26, 2024)
 
-------------------------------------------------------------------------
-
 ```{r}
-#| echo: false
 #| message : false
-
-
+#| warning: false
 
 # Plots for Likert chart
 
@@ -28,6 +29,7 @@ here::set_here("/Users/cheng/OneDrive - ird.global/Desktop/R Projects/R Workshop
 # Load data
 url <- "https://docs.google.com/spreadsheets/d/12jxEV9rqIOrIw70lVXfSegorv25owciTMS-hjSotioo/edit?resourcekey#gid=1120526525"
 dat <- read_sheet(url)
+r_session <- read_csv("R Workshop January 2024 (participant characteristics) - Copy of Attended for 1 day.csv")
 
 dat1 <- dat |> 
   rename(email = 2) |> 
@@ -210,9 +212,6 @@ library(stringr)
 library(gtsummary)
 library(flextable)
 
-# Set working directory
-here::set_here("/Users/cheng/OneDrive - ird.global/Desktop/R Projects/R Workshop Feedback/R_workshop_feedback")
-
 # Load data
 url <- "https://docs.google.com/spreadsheets/d/12jxEV9rqIOrIw70lVXfSegorv25owciTMS-hjSotioo/edit?resourcekey#gid=1120526525"
 dat <- read_sheet(url)
@@ -357,14 +356,82 @@ respondents_details <- combi |>
     org = setLabels(org, "Organization"),
     SSRG = setLabels(SSRG, "Part of SSRG")
     )|> 
-  tbl_summary()
+  tbl_summary() |> 
+    bold_labels()
 ```
+
+The Small Scale Research Grant is an initiative of the PIECEs project (funded by NIHR) under the mental health program-IRD-Pakistan. It aims to support early-career researchers in enhancing their research and grant management skills. Out of 111 received applications across Pakistan, five projects were finalized. The project teams received support through fortnightly check-ins from PIECEs team grant management officers. Additionally, knowledge exchange meetings with QMUL were organized to share updates and exchange practices with other SSRG-funded projects.
+
+## Pre-registration:
+
+The R session for SSRG was introduced as an extension of capacity-building training to SSRG awardees. The registration call for the R session was circulated in October 2023 among SSRG awardees and across IRD countries. Registration details included information on gender, country of residence, IRD employment status, SSRG awardee status, and consent for data privacy, future communication, and cancellation policy. A total of 48 participants from Bangladesh, the Philippines, Pakistan, Nigeria, the United States, the United Arab Emirates (Dubai), and South Africa registered for the training session.
+
+## Workshop curriculum:
+
+The training session took place successfully from January 22nd to 26th, spanning five days, with each session lasting 2.5 hours. The sessions were conducted by two esteemed facilitators, Zaw Myo Tun (Senior Manager, Global Research Office) and Cheng Yew Toon (Deputy Manager, Grant Management Office).
+
+| **Topic**                                           | **Duration in hours** | **Presenter**  |
+|----------------------------------|:-----------------:|:-----------------:|
+| Intro to R syntax                                   |           1           | Cheng Yew Toon |
+| Data viz (Including setting up project + read data) |          2.5          |  Zaw Myo Tun   |
+| Data management                                     |          2.5          | Cheng Yew Toon |
+| Factors and dates                                   |           1           |  Zaw Myo Tun   |
+| Descriptive statistics                              |           1           |  Zaw Myo Tun   |
+| Intro to Quarto                                     |           2           | Cheng Yew Toon |
+| Programmatic report generation                      |           1           |  Zaw Myo Tun   |
+| Basic dashboarding                                  |          1.5          |  Zaw Myo Tun   |
+
+{{< pagebreak >}}
+
+## Session attendance
+
+The plot below shows daily attendance of R session participants.
+
+```{r}
+#| fig-width: 7
+#| fig-height: 3
+#| fig-align: center
+
+dat <- data.frame(
+  days = 1:5,
+  attended = c(32, 31, 29, 25, 26)
+)
+```
+
+```{r}
+ggplot(dat, aes(x = days, y = attended)) +
+  geom_line(colour = "steelblue") +
+  geom_point(colour = "steelblue", size = 3) +
+  labs(x = "workshop day", y = "",
+       title = "Daily number of workshop participants") +
+  scale_y_continuous(limits = c(0, 48), labels = scales::label_number()) +
+  theme_minimal() +
+  theme(
+    panel.grid.minor.x = element_blank()
+  )
+```
+
+In total, 35 people participated. 3 attended for one day, 1 attended for 2 days, and 31 attended for 3 or more days. `r respondents_count` participants provided feedback on what went well and areas for improvement. Certification was contingent on attending at least 3 out of the 5 days.
+
+```{r}
+r_session |> 
+  select(gender, country, type, organization) |> 
+  tbl_summary(label = list(
+    gender ~ "Gender",
+    country ~ "Country of Residence",
+    type ~ "Type of Participant",
+    organization ~ "Participant Organization"
+  )) |> 
+  bold_labels()
+```
+
+------------------------------------------------------------------------
 
 ## Feedback for R Workshop
 
-Out of `XX` participants who attended the workshop, `r respondents_count` provided their feedback for the workshop.
+Out of `r nrow(r_session)` participants who attended the workshop, `r respondents_count` provided their feedback for the workshop.
 
-Below is the demographics of the feedback providers.
+Below are the demographics of the feedback providers.
 
 ```{r}
 #| echo: false
@@ -375,24 +442,19 @@ respondents_details
 
 ```{r}
 #| echo: false
+#| fig-width: 7
+#| fig-height: 2.5
+#| fig-align: center
 p_pre_wksp
 ```
 
 Based on the feedback of the respondents, the pre-workshop organisation was seen as successful.
 
-The participants were satisfied with the registration process, noting that the large majority `(76.9%)` of the respondents strongly agreed that it was register for the workshop.
+The participants were satisfied with the registration process, noting that the large majority of the respondents *strongly agreed* that it was easy to register for the workshop.
 
-`More than 70%` of the respondents strongly agreed that communications for the workshop were clear and they were timely.
+Large majority of the respondents *strongly agreed* that communications for the workshop were clear and they were timely.
 
-Regarding the instructions for the workshop preparation, `57.7%` of the respondents strongly agreed that it was clear and `42.3%` agreed that is was clear.
-
-Below are written feedback provided by the `r nrow(dat1)` respondents.
-
-```{r}
-#| echo: false
-#| collapse: true
-feedback_org
-```
+Regarding the instructions for the workshop preparation, large majority of the respondents *strongly agreed* that it was clear.
 
 The most common feedback on what was done well for the pre-workshop organisation is that the communication of the workshop was clear and timely.
 
@@ -410,43 +472,49 @@ In this section we will look at 2 likert scales for facilitator performance and 
 
 ```{r}
 #| echo: false
+#| fig-width: 6
+#| fig-height: 3
+#| fig-align: center
 p_explain
 ```
 
 Regarding the facilitator's performance, the feedback are mostly well received.
 
--   For Intro to R, `34.6%` of the respondents strongly agreed that the facilitator explanation was easy to follow and the large majority at `57.7%` agreed.
+-   For Intro to R, the large majority of the respondents *agreed* that the facilitator explanation was easy to follow.
 
--   For Data Visualization, the large majority of respondents at `50%` strongly agreed that the facilitator explanation was easy to follow and `42.3%` agreed.
+-   For Data Visualization, the large majority of respondents *strongly agreed* that the facilitator explanation was easy to follow.
 
--   For Data Wrangling, the large majority of respondents at `50%` strongly agreed that the facilitator explanation was easy to follow and `46.2%` agreed.
+-   For Data Wrangling, the majority of respondents *strongly agreed* that the facilitator explanation was easy to follow. There is also a small proportion of participants who *disagreed*.
 
--   For Descriptive Analysis, `38.5%` of the respondents strongly agreed that the facilitator explanation was easy to follow and the large majority at `42.3%` agreed.
+-   For Descriptive Analysis, the large majority of respondents *strongly agreed* that the facilitator explanation was easy to follow.
 
--   For Intro to Quarto, the large majority of respondents at `50%` strongly agreed that the facilitator explanation was easy to follow and `34.6%` agreed.
+-   For Intro to Quarto, the large majority of respondents *strongly agreed* that the facilitator explanation was easy to follow.
 
--   For Report Generation, the large majority of respondents at `53.8%` strongly agreed that the facilitator explanation was easy to follow and `30.8%` agreed.
+-   For Report Generation, the large majority of respondents *strongly agreed* that the facilitator explanation was easy to follow.
 
 #### Quality of training materials
 
 ```{r}
 #| echo: false
+#| fig-width: 6
+#| fig-height: 3
+#| fig-align: center
 p_materials
 ```
 
 Regarding the quality of training materials, the feedback are mostly well received as well.
 
--   For Intro to R, `38.5%` of the respondents strongly agreed that the training materials were clear and adequate and the large majority at `53.8%` agreed.
+-   For Intro to R, large majority of the respondents *agreed* that the training materials were clear and adequate.There is also a small proportion of participants who *disagreed*.
 
--   For Data Visualization, the large majority of respondents at `50%` strongly agreed that the training materials were clear and adequate and `46.2%` agreed.
+-   For Data Visualization, large majority of the respondents *strongly agreed* that the training materials were clear and adequate.
 
--   For Data Wrangling, `42.3%` of the respondents strongly agreed that the training materials were clear and adequate and the large majority at `53.8%` agreed.
+-   For Data Wrangling, large majority of the respondents *agreed* that the training materials were clear and adequate.
 
--   For Descriptive Analysis, `38.5%` of the respondents strongly agreed that the training materials were clear and adequate and the large majority at `50%` agreed.
+-   For Descriptive Analysis, large majority of the respondents *agreed* that the training materials were clear and adequate.
 
--   For Intro to Quarto, `42.3%` of the respondents strongly agreed that the training materials were clear and adequate and the large majority at `46.2%` agreed.
+-   For Intro to Quarto, large majority of the respondents *strongly agreed* that the training materials were clear and adequate.
 
--   For Report Generation, `42.3%` of the respondents strongly agreed that the training materials were clear and adequate and the large majority at `46.2%` agreed.
+-   For Report Generation, large majority of the respondents *strongly agreed* that the training materials were clear and adequate.
 
 ------------------------------------------------------------------------
 
@@ -462,13 +530,6 @@ The most common suggestions for improvement was that the participants would like
 
 Other suggestions include having to share more materials for the participants to understand more in-depth and the session could be more in-depth.
 
-Below are written feedback provided by the `r nrow(dat1)` respondents for this topic.
-
-```{r}
-#| echo: false
-feedback_intro
-```
-
 ------------------------------------------------------------------------
 
 #### Data Visualization
@@ -481,13 +542,6 @@ It is worth noting that many participants highlighted that they enjoyed this ses
 
 Other areas of improvement mentioned was that it would be good to learn more about basic commands and syntax before going into data visualization.
 
-Below are written feedback provided by the `r nrow(dat1)` respondents for this topic.
-
-```{r}
-#| echo: false
-feedback_viz
-```
-
 ------------------------------------------------------------------------
 
 #### Data Wrangling
@@ -495,13 +549,6 @@ feedback_viz
 The most common feedback for the topic on Data Wrangling was that the topic was very useful and interactive.
 
 Comments regarding areas of improvement included were that this topic is difficult, so it would be good to have time allocated for this topic and have more practice questions during the session.
-
-Below are written feedback provided by the `r nrow(dat1)` respondents for this topic.
-
-```{r}
-#| echo: false
-feedback_wrang
-```
 
 ------------------------------------------------------------------------
 
@@ -513,13 +560,6 @@ Most comments regarding areas of improvement were that the session was a little 
 
 Other suggested areas of improvement is to have more practice and allocate more time to this topic.
 
-Below are written feedback provided by the `r nrow(dat1)` respondents for this topic.
-
-```{r}
-#| echo: false
-feedback_descr
-```
-
 ------------------------------------------------------------------------
 
 #### Intro to Quarto
@@ -527,13 +567,6 @@ feedback_descr
 The most common feedback for the topic on Intro to Quarto was that the topic was useful.
 
 Most comments regarding areas of improvement were that the participants would like more practice on this topic.
-
-Below are written feedback provided by the `r nrow(dat1)` respondents for this topic.
-
-```{r}
-#| echo: false
-feedback_quarto
-```
 
 ------------------------------------------------------------------------
 
@@ -543,26 +576,8 @@ The most common feedback for the topic on Report Generation was that the topic w
 
 Most comments regarding areas of improvement were that the participants would like more time allocated to this topic and more practice opportunities during the session.
 
-Below are written feedback provided by the `r nrow(dat1)` respondents for this topic.
-
-```{r}
-#| echo: false
-
-feedback_report
-
-```
-
 ------------------------------------------------------------------------
 
 #### General feedback and suggestions
 
 The general feedback received was that the workshop was well planned and delivered. The participants were thankful for the learning opportunity and they would like more workshops like this.
-
-Below are written feedback provided by the `r nrow(dat1)` respondents.
-
-```{r}
-#| echo: false
-
-feedback_general
-
-```
