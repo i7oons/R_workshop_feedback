@@ -89,9 +89,9 @@ feedback_coltypes <- "Tciiiicciicciicciicciicciicciiccc" # Manually specifying c
 feedback <- read_sheet(feedback_url, col_types = feedback_coltypes)
 ```
 
-This workshop was supported by the Small Scale Research Grant (SSRG), an initiative of the PIECEs project (funded by National Institute for Health and Care Research (NIHR)) under the mental health program of Interactive Research & Development (IRD) - Pakistan. The initiative aims to enhance research and grant management skills of early-career researchers in Pakistan. Five projects out of 111 applications were selected. This workshop is part of the capacity building effort for SSRG awardees.
+This workshop was supported by the Small Scale Research Grant (SSRG), an initiative of the PIECEs project (funded by National Institute for Health and Care Research (NIHR)) under the mental health programme of Interactive Research & Development (IRD) - Pakistan. PIECEs stands for Improving outcomes for people with psychosis in Pakistan and India -- enhancing the Effectiveness of Community-based care. The initiative aims to enhance research and grant management skills of early-career researchers in Pakistan. Five projects out of 111 applications were selected. This workshop is part of the capacity building effort for SSRG awardees.
 
-In addition to SSRG members, IRD staff members across four IRD country affiliates -- Pakistan, Bangladesh, South Africa, and Philippines -- were also invited to participate in the workshop.
+In addition to SSRG members, IRD staff members, including fellows of our Grant Writing and Research fellowship, across four IRD country affiliates -- Pakistan, Bangladesh, South Africa, and Philippines -- were also invited to participate in the workshop.
 
 ## Curriculum
 
@@ -102,7 +102,7 @@ In addition to SSRG members, IRD staff members across four IRD country affiliate
     -   Zaw Myo Tun (Senior Manager, Global Research Office)
     -   Cheng Yew Toon (Deputy Manager, Grant Management Office)
 
-This is a five-day online workshop aiming to familiarise the participants with R language and Quarto, an open-source scientific and technical publishing system for creating dynamic documents assembling the narrative, code and its output in one document. The table below shows the topics covered in the workshop and the amount of time spent for each topic. In addition to R syntax, we also covered popular R packages for performing basic data wrangling (primarily `{dplyr}`) and visualisation (`{ggplot2}`). In addition, we used an example of a simple monthly report of a public health project to show case the basic capabilities of Quarto.
+This is a five-day online workshop aiming to familiarise the participants with [R language](https://cran.r-project.org/) and [Quarto](https://quarto.org/), an open-source scientific and technical publishing system for creating dynamic documents assembling the narrative, code and its output in one document. The table below shows the topics covered in the workshop and the amount of time spent for each topic. In addition to R syntax, we also covered popular R packages for performing basic data wrangling ([primarily `{dplyr}`](https://dplyr.tidyverse.org/)) and [visualisation (`{ggplot2}`)](https://ggplot2.tidyverse.org/). In addition, we used an example of a simple monthly report of a public health project to show case the basic capabilities of Quarto.
 
 | **Topic**                                                                 | **Duration in hours** | **Presenter**  |
 |-----------------------------------|:-----------------:|:----------------:|
@@ -119,7 +119,7 @@ Workshop registration was open in October 2023. Of 48 people registered, 35 atte
 
 ```{r}
 participants |> 
-  select(gender, country, type, org) |> 
+  select(gender, country, type, org, SSRG) |> 
   mutate(
     type = recode(type, "SSRG" = "PIECEs"),
     type = factor(type, levels = c("PIECEs", "Fellowship", "Other")),
@@ -128,11 +128,16 @@ participants |>
   ) |> 
   tbl_summary(label = list(
     gender ~ "Gender",
-    country ~ "Country of Residence",
-    type ~ "Type of Participant",
-    org ~ "Participant Organization"
+    country ~ "Country of residence",
+    type ~ "Participant category",
+    org ~ "Participant's organisation"
   )) |> 
-  bold_labels()
+  bold_labels() |> 
+  modify_table_styling(
+    columns = label,
+    rows = label == "SSRG",
+    footnote = "i.e. Small Scale Research Grant"
+    )
 ```
 
 The figure below shows daily attendance of R session participants. Compared to 32 participants on the first day, the majority (81%) remained in the workshop on the last two days. This suggests a strong level of interest in R among the participants and in a way the usefulness and quality of the training.
@@ -205,12 +210,16 @@ participants |>
     )|> 
   tbl_summary(label = list(
     gender ~ "Gender",
-    country ~ "Country of Residence",
-    type ~ "Type of Participant",
-    org ~ "Participant Organization"
+    country ~ "Country of residence",
+    type ~ "Participant category",
+    org ~ "Participant's organisation"
   )) |> 
-  bold_labels()
-
+  bold_labels() |> 
+  modify_table_styling(
+    columns = label,
+    rows = label == "SSRG",
+    footnote = "i.e. Small Scale Research Grant"
+    )
 ```
 
 Overall, the feedback from participants was largely positive. In the rest of the report, we provide more details on quantitative rating and a summary of qualitative feedback.
@@ -401,7 +410,7 @@ During this workshop, we introduced participants to the R language for data anal
 
 We would like to thank Nabeel Nisar, Abdul Rabb and Maryam Younus for providing the technical set up and assisting the on-site SSRG participants in Pakistan.
 
-## Table of Acronyms
+## Acronyms
 
 |      |                                                 |
 |------|-------------------------------------------------|
