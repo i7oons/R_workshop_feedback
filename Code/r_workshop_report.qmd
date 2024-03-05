@@ -72,7 +72,13 @@ at_least_one_day <- read_csv(here("data", "R Workshop January 2024 (participant 
   rename(
     first_name = `Given/First Name`,
     last_name = `Family/Last Name`
-  )
+  ) |> 
+  mutate(
+    first_name = case_when(
+      first_name == "Adbul" ~ "Abdul",
+      .default = first_name
+    )
+  ) 
 
 participants <- registrants |> 
   semi_join(at_least_one_day, join_by(first_name, last_name))
@@ -83,9 +89,9 @@ feedback_coltypes <- "Tciiiicciicciicciicciicciicciiccc" # Manually specifying c
 feedback <- read_sheet(feedback_url, col_types = feedback_coltypes)
 ```
 
-This workshop was supported by the Small Scale Research Grant (SSRG), an initiative of the PIECEs project (funded by NIHR) under the mental health program of IRD-Pakistan. The initiative aims to enhance research and grant management skills of early-career researchers in Pakistan. Five projects out of 111 applications were selected. This workshop is part of the capacity building effort for SSRG awardees.
+This workshop was supported by the Small Scale Research Grant (SSRG), an initiative of the PIECEs project (funded by National Institute for Health and Care Research (NIHR)) under the mental health program of Interactive Research & Development (IRD) - Pakistan. The initiative aims to enhance research and grant management skills of early-career researchers in Pakistan. Five projects out of 111 applications were selected. This workshop is part of the capacity building effort for SSRG awardees.
 
-In addition to SSRG members, IRD staff members across four IRD country affiliates – Pakistan, Bangladesh, South Africa, and Philippines – were also invited to participate in the workshop.
+In addition to SSRG members, IRD staff members across four IRD country affiliates -- Pakistan, Bangladesh, South Africa, and Philippines -- were also invited to participate in the workshop.
 
 ## Curriculum
 
@@ -98,14 +104,14 @@ In addition to SSRG members, IRD staff members across four IRD country affiliate
 
 This is a five-day online workshop aiming to familiarise the participants with R language and Quarto, an open-source scientific and technical publishing system for creating dynamic documents assembling the narrative, code and its output in one document. The table below shows the topics covered in the workshop and the amount of time spent for each topic. In addition to R syntax, we also covered popular R packages for performing basic data wrangling (primarily `{dplyr}`) and visualisation (`{ggplot2}`). In addition, we used an example of a simple monthly report of a public health project to show case the basic capabilities of Quarto.
 
-| **Topic**                                                       | **Duration in hours** | **Presenter**  |
+| **Topic**                                                                 | **Duration in hours** | **Presenter**  |
 |-----------------------------------|:-----------------:|:----------------:|
-| Intro to R syntax                                               |          2.5          | Cheng Yew Toon |
-| Data viz (Including setting up project and reading data into R) |          2.5          |  Zaw Myo Tun   |
-| Data management                                                 |          2.5          | Cheng Yew Toon |
-| Dates and descriptive analysis                                  |          1.5          |  Zaw Myo Tun   |
-| Introduction to Quarto                                          |           1           | Cheng Yew Toon |
-| Programmatic report generation                                  |          2.5          |  Zaw Myo Tun   |
+| Intro to R syntax                                                         |          2.5          | Cheng Yew Toon |
+| Data visualisation (Including setting up project and reading data into R) |          2.5          |  Zaw Myo Tun   |
+| Data management                                                           |          2.5          | Cheng Yew Toon |
+| Dates and descriptive analysis                                            |          1.5          |  Zaw Myo Tun   |
+| Introduction to Quarto                                                    |           1           | Cheng Yew Toon |
+| Programmatic report generation                                            |          2.5          |  Zaw Myo Tun   |
 
 ## Workshop Participation
 
@@ -191,6 +197,12 @@ To encourage participants to provide feedback on the workshop, we only provided 
 participants |> 
   semi_join(feedback1, join_by(email)) |> 
   select(-c(email, first_name, last_name)) |> 
+  mutate(
+    type = recode(type, "SSRG" = "PIECEs"),
+    type = factor(type, levels = c("PIECEs", "Fellowship", "Other")),
+    org = factor(org, levels = c("IRD", "Not IRD"),
+                 labels = c("IRD staff", "External participant"))
+    )|> 
   tbl_summary(label = list(
     gender ~ "Gender",
     country ~ "Country of Residence",
@@ -198,6 +210,7 @@ participants |>
     org ~ "Participant Organization"
   )) |> 
   bold_labels()
+
 ```
 
 Overall, the feedback from participants was largely positive. In the rest of the report, we provide more details on quantitative rating and a summary of qualitative feedback.
@@ -387,3 +400,12 @@ During this workshop, we introduced participants to the R language for data anal
 ## Acknowledgement
 
 We would like to thank Nabeel Nisar, Abdul Rabb and Maryam Younus for providing the technical set up and assisting the on-site SSRG participants in Pakistan.
+
+## Table of Acronyms
+
+|      |                                                 |
+|------|-------------------------------------------------|
+| IDE  | integrated development environment              |
+| IRD  | Interactive Research & Development              |
+| NIHR | National Institute for Health and Care Research |
+| SSRG | Small Scale Research Grant                      |
