@@ -105,7 +105,7 @@ In addition to SSRG members, IRD staff members across four IRD country affiliate
 This is a five-day online workshop aiming to familiarise the participants with R language and Quarto, an open-source scientific and technical publishing system for creating dynamic documents assembling the narrative, code and its output in one document. The table below shows the topics covered in the workshop and the amount of time spent for each topic. In addition to R syntax, we also covered popular R packages for performing basic data wrangling (primarily `{dplyr}`) and visualisation (`{ggplot2}`). In addition, we used an example of a simple monthly report of a public health project to show case the basic capabilities of Quarto.
 
 | **Topic**                                                                 | **Duration in hours** | **Presenter**  |
-|---------------------------------------------------------------------------|:---------------------:|:--------------:|
+|-----------------------------------|:-----------------:|:----------------:|
 | Intro to R syntax                                                         |          2.5          | Cheng Yew Toon |
 | Data visualisation (Including setting up project and reading data into R) |          2.5          |  Zaw Myo Tun   |
 | Data management                                                           |          2.5          | Cheng Yew Toon |
