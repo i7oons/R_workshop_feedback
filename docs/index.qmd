@@ -20,7 +20,6 @@ date-format: "DD MMMM YYYY"
 execute: 
   echo: false
   warning: false
-  message: false
 editor_options: 
   chunk_output_type: console
 ---
@@ -34,7 +33,7 @@ library(tidyverse)
 library(googlesheets4)
 library(here)
 library(gtsummary)
-library(flextable)
+library(gt)
 ```
 
 ```{r load-data}
@@ -132,12 +131,15 @@ participants |>
     type ~ "Participant category",
     org ~ "Participant's organisation"
   )) |> 
-  bold_labels() |> 
-  modify_table_styling(
+    modify_table_styling(
     columns = label,
     rows = label == "SSRG",
-    footnote = "i.e. Small Scale Research Grant"
-    )
+    footnote = "Small Scale Research Grant"
+  ) |> 
+  as_gt() %>%
+  tab_header(title = md("**Participant Characteristics**"))
+
+ 
 ```
 
 The figure below shows daily attendance of R session participants. Compared to 32 participants on the first day, the majority (81%) remained in the workshop on the last two days. This suggests a strong level of interest in R among the participants and in a way the usefulness and quality of the training.
@@ -219,7 +221,9 @@ participants |>
     columns = label,
     rows = label == "SSRG",
     footnote = "i.e. Small Scale Research Grant"
-    )
+    ) |> 
+  as_gt() %>%
+  tab_header(title = md("**Respondent Characteristics**"))
 ```
 
 Overall, the feedback from participants was largely positive. In the rest of the report, we provide more details on quantitative rating and a summary of qualitative feedback.
